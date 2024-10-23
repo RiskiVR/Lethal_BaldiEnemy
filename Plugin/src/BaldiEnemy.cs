@@ -1,6 +1,5 @@
 using System.Collections;
 using GameNetcodeStuff;
-using Unity.Mathematics;
 using UnityEngine;
 using Unity.Netcode.Components;
 
@@ -24,6 +23,7 @@ public class BaldiEnemy : EnemyAI
         base.Start();
         agent.speed = 0;
         moveTimer = 0;
+        BaldiHearingManager.RegisterSpawnedBaldi(this);
     }
     public override void Update()
     {
@@ -54,7 +54,7 @@ public class BaldiEnemy : EnemyAI
         base.DoAIInterval();
         switch (currentBehaviourStateIndex)
         {
-            case (int)States.Roam: 
+            case (int)States.Roam:
                 Roam();
                 break;
             case (int)States.Active:
@@ -73,8 +73,16 @@ public class BaldiEnemy : EnemyAI
                 SwitchToBehaviourClientRpc((int)States.Active);
             }
         }
-        SetDestinationToPosition()
     }
+
+    public void HearDoorStateChange(Vector3 DoorPosition)
+    {
+        if (currentBehaviourStateIndex == (int)States.Roam)
+        {
+            SetDestinationToPosition(DoorPosition);
+        }
+    }
+
     public void Active()
     {
         if (targetPlayer == null || Vector3.Distance(targetPlayer.transform.position, transform.position) > 100f)
@@ -84,7 +92,7 @@ public class BaldiEnemy : EnemyAI
         }
         SetDestinationToPosition(targetPlayer.transform.position);
     }
-    
+
     public override void OnCollideWithPlayer(Collider other)
     {
         base.OnCollideWithPlayer(other);
