@@ -41,7 +41,7 @@ public class BaldiEnemy : EnemyAI
         var direction = transform.position - cameraPos;
         direction.y = 0;
         var targetRot = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, targetRot.eulerAngles.y, transform.rotation.eulerAngles.z);
+        pivot.transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, targetRot.eulerAngles.y, transform.rotation.eulerAngles.z);
     }
     IEnumerator DoMovement()
     {
@@ -73,10 +73,11 @@ public class BaldiEnemy : EnemyAI
                 SwitchToBehaviourClientRpc((int)States.Active);
             }
         }
+        SetDestinationToPosition()
     }
     public void Active()
     {
-        if (targetPlayer == null || Vector3.Distance(targetPlayer.transform.position, transform.position) > 75f)
+        if (targetPlayer == null || Vector3.Distance(targetPlayer.transform.position, transform.position) > 100f)
         {
             SwitchToBehaviourClientRpc((int)States.Roam);
             return;
