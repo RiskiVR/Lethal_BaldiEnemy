@@ -5,16 +5,21 @@ using LethalLib.Modules;
 using BepInEx.Logging;
 using System.IO;
 using BaldiEnemy.Configuration;
+using HarmonyLib;
+using BaldiEnemy.Patches;
 
-namespace BaldiEnemy {
+namespace BaldiEnemy
+{
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency(LethalLib.Plugin.ModGUID)] 
-    public class Plugin : BaseUnityPlugin {
+    [BepInDependency(LethalLib.Plugin.ModGUID)]
+    public class Plugin : BaseUnityPlugin
+    {
         internal static new ManualLogSource Logger = null!;
         internal static PluginConfig BoundConfig { get; private set; } = null!;
         public static AssetBundle? ModAssets;
 
-        private void Awake() {
+        private void Awake()
+        {
             Logger = base.Logger;
 
             // If you don't want your mod to use a configuration file, you can remove this line, Configuration.cs, and other references.
@@ -29,7 +34,8 @@ namespace BaldiEnemy {
             // In that case also remember to change the asset bundle copying code in the csproj.user file.
             var bundleName = "baldiassets";
             ModAssets = AssetBundle.LoadFromFile(Path.Combine(Path.GetDirectoryName(Info.Location), bundleName));
-            if (ModAssets == null) {
+            if (ModAssets == null)
+            {
                 Logger.LogError($"Failed to load custom assets.");
                 return;
             }
@@ -68,11 +74,16 @@ namespace BaldiEnemy {
             Enemies.RegisterEnemy(BaldiEnemy, BoundConfig.SpawnWeight.Value, Levels.LevelTypes.All, BaldiEnemyTN, BaldiEnemyTK);
             // For using our rarity tables, we can use the following:
             // Enemies.RegisterEnemy(BaldiEnemy, BaldiEnemyLevelRarities, BaldiEnemyCustomLevelRarities, BaldiEnemyTN, BaldiEnemyTK);
-            
+
+            //Patch doors for Baldi's ears :3
+            Harmony patcher = new(PluginInfo.PLUGIN_GUID);
+            patcher.PatchAll(typeof(DoorPatch));
+
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_NAME} is awake :3");
         }
 
-        private static void InitializeNetworkBehaviours() {
+        private static void InitializeNetworkBehaviours()
+        {
             // See https://github.com/EvaisaDev/UnityNetcodePatcher?tab=readme-ov-file#preparing-mods-for-patching
             var types = Assembly.GetExecutingAssembly().GetTypes();
             foreach (var type in types)
@@ -87,6 +98,6 @@ namespace BaldiEnemy {
                     }
                 }
             }
-        } 
+        }
     }
 }
