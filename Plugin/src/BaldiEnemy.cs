@@ -64,7 +64,7 @@ public class BaldiEnemy : EnemyAI
     }
     public void Roam()
     {
-        var colliders = Physics.OverlapSphere(transform.position, 25, LayerMask.GetMask("Player"), QueryTriggerInteraction.Collide);
+        var colliders = Physics.OverlapSphere(transform.position, 50, LayerMask.GetMask("Player"), QueryTriggerInteraction.Collide);
         foreach (Collider c in colliders)
         {
             if (c.gameObject.TryGetComponent(out PlayerControllerB player) && player.isPlayerControlled && !player.isPlayerDead)
