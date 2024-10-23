@@ -10,7 +10,7 @@ public class DoorPatch
     [HarmonyPatch(typeof(DoorLock), nameof(DoorLock.OpenOrCloseDoor))]
     public static void DoorStatePatch(DoorLock __instance)
     {
-        Plugin.Logger.LogInfo($"A door has changed state at position {__instance.transform.position}");
+        //Plugin.Logger.Loginfo($"A door has changed state at position {__instance.transform.position}");
         BaldiHearingManager.AlertBaldiToDoorSound(__instance.transform.position);
     }
 }
