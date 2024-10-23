@@ -24,12 +24,19 @@ public class BaldiEnemy : EnemyAI
         agent.speed = 0;
         moveTimer = 0;
         BaldiHearingManager.RegisterSpawnedBaldi(this);
+        Plugin.Logger.LogInfo("A Baldi has registered for hearing manager");
     }
     public override void Update()
     {
         base.Update();
+
+        //Force reset our target if we kill it
+        //logic relies on this elsewhere
         if (targetPlayer != null && targetPlayer.isPlayerDead) targetPlayer = null;
+
+        //increment movement timer each frame
         moveTimer += Time.deltaTime;
+
         if (moveTimer >= 2.2f)
         {
             StartCoroutine(DoMovement());
@@ -37,6 +44,8 @@ public class BaldiEnemy : EnemyAI
             creatureAnimator.SetTrigger("slap");
             moveTimer = 0;
         }
+
+        //Always look towards the active camera
         var cameraPos = GameNetworkManager.Instance.localPlayerController.gameplayCamera.transform.position;
         var direction = transform.position - cameraPos;
         direction.y = 0;
@@ -45,6 +54,7 @@ public class BaldiEnemy : EnemyAI
     }
     IEnumerator DoMovement()
     {
+        Plugin.Logger.LogInfo($"Baldi is doing movement destination: {destination}");
         agent.speed = 100;
         yield return new WaitForSeconds(0.1f);
         agent.speed = 0;
@@ -71,6 +81,7 @@ public class BaldiEnemy : EnemyAI
             {
                 targetPlayer = player;
                 SwitchToBehaviourClientRpc((int)States.Active);
+                Plugin.Logger.LogInfo("Baldi is switching to Active");
             }
         }
     }
@@ -79,6 +90,7 @@ public class BaldiEnemy : EnemyAI
     {
         if (currentBehaviourStateIndex == (int)States.Roam)
         {
+            Plugin.Logger.LogInfo($"Baldi has heard a door update at {DoorPosition}");
             SetDestinationToPosition(DoorPosition);
         }
     }
