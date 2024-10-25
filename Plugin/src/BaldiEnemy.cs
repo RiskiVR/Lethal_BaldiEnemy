@@ -48,6 +48,8 @@ public class BaldiEnemy : EnemyAI
             float coeff = RoundManager.Instance.valueOfFoundScrapItems / RoundManager.Instance.totalScrapValueInLevel;
             
             moveTime = Mathf.Lerp(2.5f, 0.75f, coeff);
+
+            if (RoundManager.Instance.powerOffPermanently) moveTime *= 0.5f; // >:3
         }
 
         //Always look towards the active camera
