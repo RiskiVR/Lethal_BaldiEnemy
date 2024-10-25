@@ -13,6 +13,7 @@ public class BaldiEnemy : EnemyAI
     [SerializeField] GameObject billboard;
     [SerializeField] GameObject pivot;
     float moveTimer;
+    float moveTime = 2.5f;
     enum States
     {
         Roam,
@@ -37,12 +38,16 @@ public class BaldiEnemy : EnemyAI
         //increment movement timer each frame
         moveTimer += Time.deltaTime;
 
-        if (moveTimer >= 2.2f)
+        if (moveTimer >= moveTime)
         {
             StartCoroutine(DoMovement());
             creatureSFX.PlayOneShot(slap);
             creatureAnimator.SetTrigger("slap");
             moveTimer = 0;
+            
+            float coeff = RoundManager.Instance.valueOfFoundScrapItems / RoundManager.Instance.totalScrapValueInLevel;
+            
+            moveTime = Mathf.Lerp(2.5f, 0.75f, coeff);
         }
 
         //Always look towards the active camera
