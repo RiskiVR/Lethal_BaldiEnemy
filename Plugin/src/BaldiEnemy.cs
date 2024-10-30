@@ -97,6 +97,12 @@ public class BaldiEnemy : EnemyAI
     {
         var closestTarget = this.GetClosestPlayer();
 
+        if (closestTarget = null)
+        {
+            targetPlayer = null;
+            return false;
+        }
+
         if (Vector3.Distance(this.transform.position, closestTarget.transform.position) < 50f)
         {
             targetPlayer = closestTarget;
