@@ -97,7 +97,7 @@ public class BaldiEnemy : EnemyAI
     {
         var closestTarget = this.GetClosestPlayer();
 
-        if (closestTarget = null)
+        if (closestTarget == null)
         {
             targetPlayer = null;
             return false;
