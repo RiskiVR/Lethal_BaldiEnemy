@@ -49,7 +49,7 @@ public class BaldiEnemy : EnemyAI
 
             moveTime = Mathf.Lerp(2.5f, 0.75f, coeff);
 
-            if (RoundManager.Instance.powerOffPermanently) moveTime *= 0.5f; // >:3
+            if (RoundManager.Instance.powerOffPermanently) moveTime *= 0.75f; // >:3
         }
 
         //Always look towards the active camera
