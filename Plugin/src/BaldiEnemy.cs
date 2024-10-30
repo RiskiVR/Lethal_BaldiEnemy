@@ -44,9 +44,9 @@ public class BaldiEnemy : EnemyAI
             creatureSFX.PlayOneShot(slap);
             creatureAnimator.SetTrigger("slap");
             moveTimer = 0;
-            
+
             float coeff = RoundManager.Instance.valueOfFoundScrapItems / RoundManager.Instance.totalScrapValueInLevel;
-            
+
             moveTime = Mathf.Lerp(2.5f, 0.75f, coeff);
 
             if (RoundManager.Instance.powerOffPermanently) moveTime *= 0.5f; // >:3
@@ -81,16 +81,30 @@ public class BaldiEnemy : EnemyAI
     }
     public void Roam()
     {
-        var colliders = Physics.OverlapSphere(transform.position, 50, LayerMask.GetMask("Player"), QueryTriggerInteraction.Collide);
-        foreach (Collider c in colliders)
+        if (UpdateTargetSelection())
         {
-            if (c.gameObject.TryGetComponent(out PlayerControllerB player) && player.isPlayerControlled && !player.isPlayerDead)
-            {
-                targetPlayer = player;
-                SwitchToBehaviourClientRpc((int)States.Active);
-                //Plugin.Logger.Loginfo("Baldi is switching to Active");
-            }
+            SwitchToBehaviourClientRpc((int)States.Active);
+            //Plugin.Logger.Loginfo("Baldi is switching to Active");
         }
+
+    }
+
+    /// <summary>
+    /// Tries to find a target for Baldi
+    /// </summary>
+    /// <returns>True if a target is found, false otherwise</returns>
+    protected bool UpdateTargetSelection()
+    {
+        var closestTarget = this.GetClosestPlayer();
+
+        if (Vector3.Distance(this.transform.position, closestTarget.transform.position) < 50f)
+        {
+            targetPlayer = closestTarget;
+            return true;
+        }
+
+        targetPlayer = null;
+        return false;
     }
 
     public void HearDoorStateChange(Vector3 DoorPosition)
@@ -104,12 +118,15 @@ public class BaldiEnemy : EnemyAI
 
     public void Active()
     {
-        if (targetPlayer == null || Vector3.Distance(targetPlayer.transform.position, transform.position) > 100f)
+
+        if (!UpdateTargetSelection())
+        {
+            SetDestinationToPosition(targetPlayer.transform.position);
+        }
+        else
         {
             SwitchToBehaviourClientRpc((int)States.Roam);
-            return;
         }
-        SetDestinationToPosition(targetPlayer.transform.position);
     }
 
     public override void OnCollideWithPlayer(Collider other)
