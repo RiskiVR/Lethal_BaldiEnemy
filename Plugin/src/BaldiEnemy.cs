@@ -119,7 +119,7 @@ public class BaldiEnemy : EnemyAI
     public void Active()
     {
 
-        if (!UpdateTargetSelection())
+        if (UpdateTargetSelection())
         {
             SetDestinationToPosition(targetPlayer.transform.position);
         }
