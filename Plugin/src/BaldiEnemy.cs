@@ -25,6 +25,7 @@ public class BaldiEnemy : EnemyAI
         agent.speed = 0;
         moveTimer = 0;
         BaldiHearingManager.RegisterSpawnedBaldi(this);
+        WanderToRandomNode();
         //Plugin.Logger.Loginfo("A Baldi has registered for hearing manager");
     }
     public override void Update()
@@ -85,8 +86,44 @@ public class BaldiEnemy : EnemyAI
         {
             SwitchToBehaviourClientRpc((int)States.Active);
             //Plugin.Logger.Loginfo("Baldi is switching to Active");
+
+            //This will prevent Baldi from running the rest of the
+            //wandering monster code when he's switching to attack mode
+            return;
         }
 
+
+        //Only update our target position if we've reached our current target
+        if (agent.remainingDistance < 1f)
+        {
+            WanderToRandomNode();
+        }
+    }
+
+    protected bool WanderToRandomNode()
+    {
+        /*
+                This code adapted from AntiSlimeCamp by TestAccount
+                I had to modify it quite a bit because it was doing very
+                strange things with a method called NextInt that just doesn't
+                exist anywhere in any extensions or objects I checked >_<
+
+                This code was greatly simplified from its original form
+            */
+
+        var array = isOutside ? RoundManager.Instance.outsideAINodes : RoundManager.Instance.insideAINodes;
+
+        if (array is null)
+        {
+            Plugin.Logger.LogError($"Monster was unable to choose a node");
+            return false;
+        }
+
+        int num = new System.Random().Next(0, array.Length);
+        Plugin.Logger.LogMessage($"Monster has chosen node {num} to wander to");
+        SetDestinationToPosition(array[num].transform.position);
+
+        return true;
     }
 
     /// <summary>
@@ -131,6 +168,10 @@ public class BaldiEnemy : EnemyAI
         }
         else
         {
+            //Seems goofy but we set our destination to ourself so our
+            //remaining distance to target is zero in the check that comes
+            //up later. This is kind of a "reset" of our target logic
+            SetDestinationToPosition(transform.position);
             SwitchToBehaviourClientRpc((int)States.Roam);
         }
     }
